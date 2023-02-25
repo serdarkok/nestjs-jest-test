@@ -10,7 +10,6 @@ export class SortService {
     return products
       .map((product) => this.setSortingScore(product))
       .sort((a, b) => b.accumulatedProductData?.sortingScore - a.accumulatedProductData?.sortingScore);
-    // TODO: dear candidate, please implement this method
   }
 
   private formulaForVariantField(fieldName: string): string {
@@ -36,12 +35,13 @@ export class SortService {
   }
 
   private setVariants(products: Array<IProduct>, formulaName: string, type: string): Array<IProduct> {
-    products.forEach((product: IProduct) => {
-      product.accumulatedProductData = { 
+    products.map((product: IProduct) => {
+      product.accumulatedProductData = {
         ...product.accumulatedProductData,
         ...this.calculateArithmetic(product.variants, formulaName, type),
         price: product.price,
       };
+      return product
     });
     return products;
   }
