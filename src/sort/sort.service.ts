@@ -27,6 +27,18 @@ export class SortService {
     }
   }
 
+  private formulaForScoring(product: IProduct, formulaName: string): number {
+    const { stock, pageView, price, conversionRate, refundRate } = product.accumulatedProductData;
+    switch(formulaName) {
+      case 'conversionRate':
+        return Math.trunc(stock + (( pageView * price * product.variants.length) / conversionRate ));
+      case 'refundRate':
+        return Math.trunc(stock + (pageView - refundRate));
+      default:
+        return null;
+    }
+  }
+
   private calculateArithmetic(variants: IVariants[], formulaName: string, type: string): object {
     const reduce: number = variants.reduce((acc, variant) => acc + variant[formulaName], 0);
     return type === 'arithmetic-sum'
@@ -47,24 +59,11 @@ export class SortService {
   }
 
   private setSortingScore(product: IProduct): IProduct {
-    const { conversionRate, refundRate } = product.accumulatedProductData;
-    let sortingScore: number;
-    if(conversionRate) {
-      sortingScore = this.setByConversionRate(product);
-    } else if(refundRate) {
-      sortingScore = this.setByRefundRate(product);
-    }
-    return { ...product, accumulatedProductData: { ...product.accumulatedProductData, sortingScore } };
-  }
-
-  private setByConversionRate(product: IProduct): number {
-    const { stock, pageView, price, conversionRate } = product.accumulatedProductData;
-    return stock + (( pageView * price * product.variants.length) / conversionRate );
-  }
-
-  private setByRefundRate(product: IProduct): number {
-    const { stock, pageView, refundRate } = product.accumulatedProductData;
-    return stock + (pageView - refundRate);
+    const accumulatedKeys = Object.keys(product.accumulatedProductData);
+    accumulatedKeys.forEach((value) => {
+      product.accumulatedProductData.sortingScore = this.formulaForScoring(product, value);
+    });
+    return product
   }
 
 }
