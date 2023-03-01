@@ -11,8 +11,8 @@ export interface IVariants {
   refundRate?: number
 }
 
-interface IAccumulatedProductData {
-  stock: number;
+export interface IAccumulatedProductData {
+  stock?: number;
   pageView?: number;
   conversionRate?: number;
   price?: number;
